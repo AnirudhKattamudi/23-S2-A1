@@ -5,6 +5,9 @@ from typing import Optional
 from base_enum import BaseEnum
 from team import MonsterTeam
 
+print("hi")
+print("hello world")
+
 
 class Battle:
 

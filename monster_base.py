@@ -15,6 +15,7 @@ class MonsterBase(abc.ABC):
         self.simple_mode = simple_mode
         self.level = level
         self.original_level = level
+        #initial intialisation for all parameters
 
         #choose whether you want to use simple or complex stats
         if simple_mode:
@@ -32,7 +33,9 @@ class MonsterBase(abc.ABC):
 
     def level_up(self):
         """Increase the level of this monster instance by 1"""
+        hp_to_be_maintained = self.get_max_hp() - self.get_hp() #this gives us the value of what needs to be remained constant
         self.level += 1
+        self.set_hp(self.get_max_hp() - hp_to_be_maintained)
 
     def get_hp(self):
         """Get the current HP of this monster instance"""
@@ -40,27 +43,32 @@ class MonsterBase(abc.ABC):
 
     def set_hp(self, val):
         """Set the current HP of this monster instance"""
-        raise NotImplementedError
+        self.current_hp = val
+        #changes the current hp to whatever 'val' is
 
     def get_attack(self):
         """Get the attack of this monster instance"""
-        return self.attack
+        return self.stats.get_attack()
 
     def get_defense(self):
         """Get the defense of this monster instance"""
-        return self.defense
+        return self.stats.get_defense()
 
     def get_speed(self):
         """Get the speed of this monster instance"""
-        return self.speed
+        return self.stats.get_speed()
 
     def get_max_hp(self):
         """Get the maximum HP of this monster instance"""
-        return self.max_hp
+        return self.stats.get_max_hp()
+    
+    #for the last four methods, the values are found through by calling the function
+    #and looking for the current value
 
     def alive(self) -> bool:
         """Whether the current monster instance is alive (HP > 0 )"""
-        raise NotImplementedError
+        if self.current_hp > 0:
+            return True
 
     def attack(self, other: MonsterBase):
         """Attack another monster instance"""
@@ -68,7 +76,7 @@ class MonsterBase(abc.ABC):
         # Step 2: Apply type effectiveness
         # Step 3: Ceil to int
         # Step 4: Lose HP
-        raise NotImplementedError
+        
 
     def ready_to_evolve(self) -> bool:
         """Whether this monster is ready to evolve. See assignment spec for specific logic."""

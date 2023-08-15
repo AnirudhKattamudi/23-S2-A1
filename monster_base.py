@@ -76,7 +76,7 @@ class MonsterBase(abc.ABC):
         # Step 2: Apply type effectiveness
         # Step 3: Ceil to int
         # Step 4: Lose HP
-    raise NotImplementedError   
+      
 
     def ready_to_evolve(self) -> bool:
         """Whether this monster is ready to evolve. See assignment spec for specific logic."""
@@ -84,8 +84,8 @@ class MonsterBase(abc.ABC):
     
     def evolve(self) -> MonsterBase:
         """Evolve this monster instance by returning a new instance of a monster class."""
-        evolution_check = self.get_evolution()(simple_mode == self.simple_mode, level == self.current_level)
-        evolution.set_hp(evolution_check.get_max_hp() - (self.get_max_hp() - self.get_hp()))
+        evolution_check = self.get_evolution()(simple_mode = self.simple_mode, level = self.current_level)
+        evolution_check.set_hp(evolution_check.get_max_hp() - (self.get_max_hp() - self.get_hp()))
         return evolution_check
         
 

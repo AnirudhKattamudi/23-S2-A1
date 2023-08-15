@@ -25,7 +25,7 @@ class MonsterBase(abc.ABC):
             self.stats = self.get_complex_stats()
             
         
-        self.current_hp = self.stats.get_max_hp() #initialise the current hp as the max hp at the start
+        self.current_hp = self.get_max_hp() #initialise the current hp as the max hp at the start
 
     def get_level(self):
         """The current level of this monster instance"""
@@ -76,15 +76,18 @@ class MonsterBase(abc.ABC):
         # Step 2: Apply type effectiveness
         # Step 3: Ceil to int
         # Step 4: Lose HP
-        
+    raise NotImplementedError   
 
     def ready_to_evolve(self) -> bool:
         """Whether this monster is ready to evolve. See assignment spec for specific logic."""
-        raise NotImplementedError
-
+        return self.get_evolution() and self.current_level > self.level
+    
     def evolve(self) -> MonsterBase:
         """Evolve this monster instance by returning a new instance of a monster class."""
-        raise NotImplementedError
+        evolution_check = self.get_evolution()(simple_mode == self.simple_mode, level == self.current_level)
+        evolution.set_hp(evolution_check.get_max_hp() - (self.get_max_hp() - self.get_hp()))
+        return evolution_check
+        
 
     ### NOTE
     # Below is provided by the factory - classmethods

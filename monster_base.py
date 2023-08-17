@@ -39,7 +39,7 @@ class MonsterBase(abc.ABC):
 
     def get_hp(self):
         """Get the current HP of this monster instance"""
-        return self.hp
+        return self.current_hp
 
     def set_hp(self, val):
         """Set the current HP of this monster instance"""
@@ -69,6 +69,8 @@ class MonsterBase(abc.ABC):
         """Whether the current monster instance is alive (HP > 0 )"""
         if self.current_hp > 0:
             return True
+        else:
+            return False
 
     def attack(self, other: MonsterBase):
         """Attack another monster instance"""
@@ -76,18 +78,31 @@ class MonsterBase(abc.ABC):
         # Step 2: Apply type effectiveness
         # Step 3: Ceil to int
         # Step 4: Lose HP
+        raise NotImplementedError
       
 
     def ready_to_evolve(self) -> bool:
         """Whether this monster is ready to evolve. See assignment spec for specific logic."""
-        return self.get_evolution() and self.current_level > self.level
+        if self.get_evolution() is not None and self.level > self.original_level:
+                return True
+        else: 
+            return False 
     
     def evolve(self) -> MonsterBase:
         """Evolve this monster instance by returning a new instance of a monster class."""
-        evolution_check = self.get_evolution()(simple_mode = self.simple_mode, level = self.current_level)
-        evolution_check.set_hp(evolution_check.get_max_hp() - (self.get_max_hp() - self.get_hp()))
-        return evolution_check
+        evolution_check = self.get_evolution()
+        hp_to_be_maintained = self.get_max_hp() - self.current_hp
+
+        if evolution_check is None:
+            return ValueError("This monster cannot be evolved")
         
+        else:
+            evolved_monster = evolution_check(simple_mode = self.simple_mode, level = self.level)
+            evolved_monster.set_hp(evolved_monster.get_max_hp() - hp_to_be_maintained)
+            return evolved_monster
+    
+    def __str__(self):
+        return f"LV.{self.get_level()} {self.get_name()}, {self.current_hp}/{self.get_max_hp()} HP"
 
     ### NOTE
     # Below is provided by the factory - classmethods

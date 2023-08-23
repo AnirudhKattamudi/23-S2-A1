@@ -49,8 +49,16 @@ class MonsterTeam:
             raise ValueError(f"selection_mode {selection_mode} not supported.")
 
     def add_to_team(self, monster: MonsterBase):
-        raise NotImplementedError
-
+        if len(self.orignal_team) >= self.TEAM_LIMIT:
+            if self.team_mode == self.TeamMode.FRONT:
+                self.original_team.push(monster)
+            if self.team_mode == self.TeamMode.BACK:
+                self.original_team.append(monster)
+            if self.team_mode == self.TeamMode.OPTIMISE:
+                self.original.insert(monster)
+        else:
+            raise ValueError("Team is full!")
+            
     def retrieve_from_team(self) -> MonsterBase:
         raise NotImplementedError
 

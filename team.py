@@ -9,6 +9,11 @@ from helpers import get_all_monsters
 
 from data_structures.referential_array import ArrayR
 
+#import the required ADTs
+from data_structures.queue_adt import CircularQueue
+from data_structures.array_sorted_list import ArraySortedList
+from data_structures.stack_adt import ArrayStack
+
 if TYPE_CHECKING:
     from battle import Battle
 
@@ -39,6 +44,17 @@ class MonsterTeam:
     def __init__(self, team_mode: TeamMode, selection_mode, **kwargs) -> None:
         # Add any preinit logic here.
         self.team_mode = team_mode
+        
+        #initialise all the ADTs to their corresponding team mode
+        if team_mode == self.TeamMode.FRONT:
+            self.original_team = ArrayStack(MonsterTeam.TEAM_LIMIT)
+        
+        elif team_mode == self.TeamMode.BACK:
+            self.original_team = CircularQueue(MonsterTeam.TEAM_LIMIT)
+        
+        elif team_mode == self.TeamMode.OPTIMISE:
+            self.original_team = ArraySortedList(MonsterTeam.TEAM_LIMIT)
+            
         if selection_mode == self.SelectionMode.RANDOM:
             self.select_randomly(**kwargs)
         elif selection_mode == self.SelectionMode.MANUAL:
@@ -47,23 +63,53 @@ class MonsterTeam:
             self.select_provided(**kwargs)
         else:
             raise ValueError(f"selection_mode {selection_mode} not supported.")
-
+        
+    def __len__(self):
+        return self.original_team.length
+    
     def add_to_team(self, monster: MonsterBase):
-        if len(self.orignal_team) >= self.TEAM_LIMIT:
-            if self.team_mode == self.TeamMode.FRONT:
-                self.original_team.push(monster)
-            if self.team_mode == self.TeamMode.BACK:
-                self.original_team.append(monster)
-            if self.team_mode == self.TeamMode.OPTIMISE:
-                self.original.insert(monster)
-        else:
-            raise ValueError("Team is full!")
-            
+        #depending on what type of team mode it is, it will use their
+        #element adding function to add monsters to team if its empty
+        if self.team_mode == self.TeamMode.FRONT:
+            self.original_team.push(monster)
+        if self.team_mode == self.TeamMode.BACK:
+            self.original_team.append(monster)
+        if self.team_mode == self.TeamMode.OPTIMISE:
+            self.original_team.add(monster)
+    
     def retrieve_from_team(self) -> MonsterBase:
-        raise NotImplementedError
-
+        #same as add_to_team, however we are now removing monsters when 
+        #required, and only when there are 1 or more monsters
+        
+        if self.team_mode == self.TeamMode.FRONT:
+            return self.original_team.pop()
+        elif self.team_mode == self.TeamMode.BACK:
+            return self.original_team.serve()
+        #delete_at_index needs a parameter and from the diagram provided
+        #it can be seen that the first monster is always removed
+        elif self.team_mode == self.TeamMode.OPTIMISE:
+            return self.original_team.delete_at_index(0)
+    
+        
+            
     def special(self) -> None:
+        #if the team mode is front, flip the reverse 3 monsters
+        #if self.team_mode == self.TeamMode.FRONT:
+            #if len(self.original_team) >= 3:
+                #temp_team_stack = ArrayStack(3)
+            #check that there are atleast 3 monsters to reverse
+                #for monsters in range(3):
+                    #monster = self.original_team.pop()
+                    #temp_team_stack.push(monster)
+                #remove the first three in indexes 0,1,2 and add them to temporary stack
+                #for monsters in range(3):
+                    #monster = temp_team_stack.pop()
+                    #self.original_team.push(monster)
+                #using the temporary stack that has monsters popped into and now reversed
+                #push them back into the original team stack
         raise NotImplementedError
+                
+        
 
     def regenerate_team(self) -> None:
         raise NotImplementedError

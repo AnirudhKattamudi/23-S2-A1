@@ -52,10 +52,28 @@ class ComplexStats(Stats):
         max_hp_formula: ArrayR[str],
     ) -> None:
         # TODO: Implement
-        pass
+        self.attack_formula = attack_formula
+        self.defense_formula = defense_formula
+        self.speed_formula = speed_formula
+        self.max_hp_formula = max_hp_formula
 
+    #need to create a function such that it can analyse the reverse polish notation
     def get_attack(self, level: int):
+    #     def evaluate_expression(self, level:int, expressions: List[str]) -> int:
+    #         open_stack = []
+    #         operators = {"+", "-", "*", "/", "power", "sqrt", "middle"}
+
+    #         for operator in expressions:
+    #             if operator not in operators:
+    #                 if operator == "level":
+    #                     stack.append(level)
         raise NotImplementedError
+
+                        
+
+
+            
+        
 
     def get_defense(self, level: int):
         raise NotImplementedError

@@ -42,6 +42,12 @@ class MonsterTeam:
     TEAM_LIMIT = 6
 
     def __init__(self, team_mode: TeamMode, selection_mode, **kwargs) -> None:
+        """
+            Best Case - O(1), where n is the number of elements
+            Worst case - o(n), where n is the number of elements
+            """
+        
+        
         # Add any preinit logic here.
         self.team_mode = team_mode
         
@@ -69,11 +75,16 @@ class MonsterTeam:
             raise ValueError(f"selection_mode {selection_mode} not supported.")
         
     def __len__(self):
-        len(self.original_team)
+        return self.original_team.length
     
     def add_to_team(self, monster: MonsterBase):
+        """
+            Best Case - O(1), where is the number of monsters
+            Worst Case - O(1), where is the number of monsters
+            """
         #depending on what type of team mode it is, it will use their
         #element adding function to add monsters to team if its empty
+        
         if self.team_mode == self.TeamMode.FRONT:
             self.original_team.push(monster)
         if self.team_mode == self.TeamMode.BACK:
@@ -82,6 +93,10 @@ class MonsterTeam:
             self.original_team.add(monster)
     
     def retrieve_from_team(self) -> MonsterBase:
+        """
+            Best Case - O(1), where is the number of monsters
+            Worst Case - O(1), where is the number of monsters
+            """
         #same as add_to_team, however we are now removing monsters when 
         #required, and only when there are 1 or more monsters
         if len(self) == 0:
@@ -98,6 +113,10 @@ class MonsterTeam:
     
         
     def special(self) -> None:
+        """
+            Best Case - O(1), where is the number of monsters
+            Worst Case - O(n), where is the number of monsters
+            """
         #when the team selection is FRONT, we need to make sure that the size is atleast 3
         #initialise the reversed monsters items to a queue as it follows a FIFO implementation
         if self.team_mode == self.TeamMode.FRONT and len(self.original_team) >= 3:
@@ -135,15 +154,22 @@ class MonsterTeam:
         if self.team_mode == self.TeamMode.OPTIMISE:
             pass
 
-    def regenerate_team(self) -> None:
-        #while
+    def regenerate_team(self) -> None: 
+        """
+            Best Case - O(1), where is the number of monsters
+            Worst Case - O(n), where is the number of monsters
+            """  
         for i in range(len(self)):
             if self.team_mode == self.TeamMode.FRONT:
+                #gets rid of all monsters in the original team
                 monsters = self.original_team.clear()
+                #resets the hp of the monsters to their original hp
                 monsters.set_hp(monsters.get_max_hp())
+                #resets her level, to level 1
                 monsters.level() == monsters.get_level(1)
+                #adds all the mosnters back after resetting their values
                 self.original_team == self.add_to_team(monsters)
-                
+            # now repeat the same stuff for BACK and OPTIMISE    
             elif self.team_mode == self.TeamMode.BACK:
                 self.original_team.clear()
                 monsters = self.original_team.clear()
@@ -158,8 +184,14 @@ class MonsterTeam:
                 monsters.level() == monsters.get_level(1)
                 self.original_team == self.add_to_team(monsters)
 
+            
+
         
     def select_randomly(self):
+        """
+            Best Case - O(n), where is the number of monsters
+            Worst Case - O(n), where is the number of monsters
+            """  
         team_size = RandomGen.randint(1, self.TEAM_LIMIT)
         monsters = get_all_monsters()
         n_spawnable = 0
@@ -288,6 +320,7 @@ class MonsterTeam:
         raise NotImplementedError
 
     def select_provided(self, provided_monsters:Optional[ArrayR[type[MonsterBase]]]=None):
+        
         """
         Generates a team based on a list of already provided monster classes.
 
@@ -299,13 +332,25 @@ class MonsterTeam:
 
         Example team if in TeamMode.FRONT:
         [Gustwing Instance, Aquariuma Instance, Flamikin Instance]
-        """
         
+        Best Case - O(n), where is the number of monsters
+        Worst Case - O(n), where is the number of monsters
+            
+        """
+        #goes through all the monsters in the monsters that are already provided
         for monsters in provided_monsters:
+            #checks if these can be spawned
             if monsters.can_be_spawned():
+                #if it can be added, add them to it
                 self.add_to_team(monsters)
 
     def choose_action(self, currently_out: MonsterBase, enemy: MonsterBase) -> Battle.Action:
+        """
+        
+            Best Case - O(n), where is the number of monsters
+            Worst Case - O(n), where is the number of monsters
+             
+         """   
         # This is just a placeholder function that doesn't matter much for testing.
         from battle import Battle
         if currently_out.get_speed() >= enemy.get_speed() or currently_out.get_hp() >= enemy.get_hp():

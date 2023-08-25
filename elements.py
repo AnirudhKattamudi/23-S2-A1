@@ -74,9 +74,13 @@ class EffectivenessCalculator:
         Fire is half effective to Fire and Water, and double effective to Grass [0.5, 0.5, 2]
         Water is double effective to Fire, and half effective to Water and Grass [2, 0.5, 0.5]
         Grass is half effective to Fire and Grass, and double effective to Water [0.5, 2, 0.5]
+        
+        Complexity Analysis: 
+        Best Case - O(1), where n is the number of elements
+        Worst Case - O(1), where n is the number of elements
         """
-        self.element_names = element_names
-        self.effectiveness_values = effectiveness_values
+        self.element_names = element_names #O(1)
+        self.effectiveness_values = effectiveness_values #O(1)
 
     @classmethod
     def get_effectiveness(cls, type1: Element, type2: Element) -> float:
@@ -84,18 +88,20 @@ class EffectivenessCalculator:
         Returns the effectivness of elem1 attacking elem2.
 
         Example: EffectivenessCalculator.get_effectiveness(Element.FIRE, Element.WATER) == 0.5
+        
+        Complexity Analysis:
+        Best Case - 
+        Worst Case - 
         """
-        index1 = cls.instance.element_names.index(type1.name.capitalize())
-        index2 = cls.instance.element_names.index(type2.name.capitalize())
+        index1 = cls.instance.element_names.index(type1.name.capitalize()) #o(1)
+        index2 = cls.instance.element_names.index(type2.name.capitalize()) #o(1)
+        #use the index method to call the index of the desired element in element names   
+        #then capitilise the string to match with the parameters given in CSV file
 
-        main_element = index1 * len(cls.instance.element_names) + index2
+        main_element = index1 * len(cls.instance.element_names) + index2 #o()
 
         return cls.instance.effectiveness_values[main_element]
-
-
-        
-
-
+    
     @classmethod
     def from_csv(cls, csv_file: str) -> EffectivenessCalculator:
         # NOTE: This is a terrible way to open csv files, if writing your own code use the `csv` module.

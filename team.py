@@ -54,6 +54,10 @@ class MonsterTeam:
         
         elif team_mode == self.TeamMode.OPTIMISE:
             self.original_team = ArraySortedList(MonsterTeam.TEAM_LIMIT)
+
+        #gets rid of sort key error
+        if 'sort_key' in kwargs:
+            del(kwargs['sort_key'])
             
         if selection_mode == self.SelectionMode.RANDOM:
             self.select_randomly(**kwargs)
@@ -65,7 +69,7 @@ class MonsterTeam:
             raise ValueError(f"selection_mode {selection_mode} not supported.")
         
     def __len__(self):
-        return self.original_team.length
+        len(self.original_team)
     
     def add_to_team(self, monster: MonsterBase):
         #depending on what type of team mode it is, it will use their
@@ -80,7 +84,9 @@ class MonsterTeam:
     def retrieve_from_team(self) -> MonsterBase:
         #same as add_to_team, however we are now removing monsters when 
         #required, and only when there are 1 or more monsters
-        
+        if len(self) == 0:
+            raise ValueError("Team is empty, there are no monsters!")
+
         if self.team_mode == self.TeamMode.FRONT:
             return self.original_team.pop()
         elif self.team_mode == self.TeamMode.BACK:
@@ -91,29 +97,68 @@ class MonsterTeam:
             return self.original_team.delete_at_index(0)
     
         
-            
     def special(self) -> None:
-        #if the team mode is front, flip the reverse 3 monsters
-        #if self.team_mode == self.TeamMode.FRONT:
-            #if len(self.original_team) >= 3:
-                #temp_team_stack = ArrayStack(3)
-            #check that there are atleast 3 monsters to reverse
-                #for monsters in range(3):
-                    #monster = self.original_team.pop()
-                    #temp_team_stack.push(monster)
-                #remove the first three in indexes 0,1,2 and add them to temporary stack
-                #for monsters in range(3):
-                    #monster = temp_team_stack.pop()
-                    #self.original_team.push(monster)
-                #using the temporary stack that has monsters popped into and now reversed
-                #push them back into the original team stack
-        raise NotImplementedError
-                
+        #when the team selection is FRONT, we need to make sure that the size is atleast 3
+        #initialise the reversed monsters items to a queue as it follows a FIFO implementation
+        if self.team_mode == self.TeamMode.FRONT and len(self.original_team) >= 3:
+            reversed_monsters_queue = CircularQueue(min(3, len(self.original_team)))
+            #if it is within the length of the team, pop the first three and then push them
+            for _ in range(len(self.original_team)):
+                reversed_monsters_queue.push(self.original_team.pop())
+            #using the elements that were originally popped, push them back into the team after
+            #being reversed
+            for _ in range(len(reversed_monsters_queue)):
+                self.original_team.push(reversed_monsters_queue.serve())
+
         
+        if self.team_mode == self.TeamMode.BACK:
+            #check how many monsters we want to move around
+            create_count = len(self.original_team)//2
+            #make the first half a queue as we can use the FIFO implementation to move them around
+            created_queue_first_half = CircularQueue[MonsterBase](create_count)
+            #make last half a stack so we can pop and push as required as it uses a LIFO implementation
+            bottom_half_stack = ArrayStack[MonsterBase](len(self.original_team))
+            
+            #moves the first half of the team to the created queue
+            for _ in range(create_count):
+                created_queue_first_half.append(self.original_team.serve())
+            #moves the bottom half to the created stack
+            for _ in range(self.original_team):
+                bottom_half_stack.push(self.original_team.serve())
+            #moves the monsters from created stack back into the team
+            for _ in range(len(bottom_half_stack)):
+                self.original_team.append(bottom_half_stack.pop())
+            #moves the monsters from the created queue into the team
+            for _ in range(len(created_queue_first_half)):
+                self.original_team.append(created_queue_first_half.serve())
+
+        if self.team_mode == self.TeamMode.OPTIMISE:
+            pass
 
     def regenerate_team(self) -> None:
-        raise NotImplementedError
+        #while
+        for i in range(len(self)):
+            if self.team_mode == self.TeamMode.FRONT:
+                monsters = self.original_team.clear()
+                monsters.set_hp(monsters.get_max_hp())
+                monsters.level() == monsters.get_level(1)
+                self.original_team == self.add_to_team(monsters)
+                
+            elif self.team_mode == self.TeamMode.BACK:
+                self.original_team.clear()
+                monsters = self.original_team.clear()
+                monsters.set_hp(monsters.get_max_hp())
+                monsters.level() == monsters.get_level(1)
+                self.original_team == self.add_to_team(monsters)
 
+            elif self.team_mode == self.TeamMode.OPTIMISE:
+                self.original_team.reset()
+                monsters = self.original_team.clear()
+                monsters.set_hp(monsters.get_max_hp())
+                monsters.level() == monsters.get_level(1)
+                self.original_team == self.add_to_team(monsters)
+
+        
     def select_randomly(self):
         team_size = RandomGen.randint(1, self.TEAM_LIMIT)
         monsters = get_all_monsters()
@@ -255,7 +300,10 @@ class MonsterTeam:
         Example team if in TeamMode.FRONT:
         [Gustwing Instance, Aquariuma Instance, Flamikin Instance]
         """
-        raise NotImplementedError
+        
+        for monsters in provided_monsters:
+            if monsters.can_be_spawned():
+                self.add_to_team(monsters)
 
     def choose_action(self, currently_out: MonsterBase, enemy: MonsterBase) -> Battle.Action:
         # This is just a placeholder function that doesn't matter much for testing.
